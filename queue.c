@@ -163,6 +163,9 @@ Queue removeHalfElementsRandomly(Queue q, Queue deletedNodes)
     numToDelete = q->currentSize - numToDelete;
 
     unsigned int* indexArray = malloc(sizeof(*indexArray) * q->currentSize);
+    if (!indexArray) {
+        exit(1);
+    }
     // init to zeroes
     for (int i = 0; i < q->currentSize; ++i)
     {
