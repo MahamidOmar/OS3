@@ -27,7 +27,7 @@ Queue request_queue;
 void *workThread(void *stat_thread)
 {
     StatThread st = (StatThread) stat_thread;
-    Time received_time;
+    Time received_time = malloc(sizeof(struct timeval));
     Request request;
     while(1)
     {
