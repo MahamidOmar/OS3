@@ -239,7 +239,7 @@ Request createRequest(int fd, Time arrive_time)
 }
 
 
-Request copyRequest(Request request)
+void* copyRequest(void* request)
 {
     if (!request) {
         return NULL;
@@ -247,7 +247,7 @@ Request copyRequest(Request request)
     return createRequest(getFdRequest(request), getArriveTimeRequest(request));
 }
 
-void destroyRequest(Request request)
+void destroyRequest(void* request)
 {
     // maybe more frees? ########################################
     free(request);

@@ -8,9 +8,9 @@ typedef struct request_m* Request;
 
 Request createRequest(int fd, Time arrive_time);
 
-Request copyRequest(Request request);
+void* copyRequest(void* request);
 
-void destroyRequest(Request request);
+void destroyRequest(void* request);
 
 int getFdRequest(Request request);
 
