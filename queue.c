@@ -172,11 +172,12 @@ Queue removeHalfElementsRandomly(Queue q, Queue deletedNodes)
         indexArray[i] = 0;
     }
 
-    srand(time(NULL));
 
     j = numToDelete;
     while (j != 0)
     {
+        srand(time(NULL));
+
         randomIndex = rand() % q->currentSize;
         if (indexArray[randomIndex] == 1)
         {
