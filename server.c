@@ -44,9 +44,9 @@ void *workThread(void *stat_thread)
         dequeElement(request_queue);
 
         // update statistics
-        increaseThreadCount(stat_thread);
+        increaseThreadCount(st);
         setDispatchRequest(request, received_time);
-        requestSetThread(request, stat_thread);
+        requestSetThread(request, st);
 
         // count workers
         ++current_working_num_threads;
