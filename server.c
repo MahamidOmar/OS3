@@ -24,9 +24,46 @@ pthread_cond_t block_cond;
 int current_working_num_threads;
 Queue request_queue;
 
-void *workThread(void *arg)
+void *workThread(void *stat_thread)
 {
+    StatThread st = (StatThread) stat_thread;
+    Time received_time;
+    Request request;
+    while(1)
+    {
+        pthread_mutex_lock(&queue_lock);
+        for (; isEmptyQueue(request_queue);)
+        {
+            pthread_cond_wait(&normal_cond, &queue_lock);
+        }
 
+        // get the time of day.
+        gettimeofday(received_time, NULL);
+        // get the request
+        request = topElement(request_queue);
+        dequeElement(request_queue);
+
+        // update statistics
+        increaseThreadCount(stat_thread);
+        setDispatchRequest(request, received_time);
+        requestSetThread(request, stat_thread);
+
+        // count workers
+        ++current_working_num_threads;
+
+        pthread_mutex_unlock(&queue_lock);
+
+        if (request)
+        {
+            requestHandle(request);
+            Close(getFdRequest(request));
+            destroyRequest(request);
+        }
+
+        pthread_mutex_lock(&queue_lock);
+        --current_working_num_threads;
+        pthread_mutex_unlock(&queue_lock);
+    }
     return NULL;
 }
 
