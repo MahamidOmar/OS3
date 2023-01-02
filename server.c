@@ -62,6 +62,7 @@ void *workThread(void *stat_thread)
 
         pthread_mutex_lock(&queue_lock);
         --current_working_num_threads;
+        pthread_cond_signal(&block_cond);
         pthread_mutex_unlock(&queue_lock);
     }
     return NULL;
@@ -205,8 +206,6 @@ void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Request r
         freeQueue(deleted_vals);
         return;
     }
-
-    addElement(request_queue, request);
 }
 
  
