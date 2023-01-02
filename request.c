@@ -189,7 +189,7 @@ void requestHandle(Request req)
 
     if (strcasecmp(method, "GET"))
     {
-        requestError(fd, method, "501", "Not Implemented", "OS-HW3 Server does not implement this method");
+        requestError(req, method, "501", "Not Implemented", "OS-HW3 Server does not implement this method");
         return;
     }
     requestReadhdrs(&rio);
@@ -197,7 +197,7 @@ void requestHandle(Request req)
     is_static = requestParseURI(uri, filename, cgiargs);
     if (stat(filename, &sbuf) < 0)
     {
-        requestError(fd, filename, "404", "Not found", "OS-HW3 Server could not find this file");
+        requestError(req, filename, "404", "Not found", "OS-HW3 Server could not find this file");
         return;
     }
 
@@ -205,18 +205,18 @@ void requestHandle(Request req)
     {
         if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode))
         {
-            requestError(fd, filename, "403", "Forbidden", "OS-HW3 Server could not read this file");
+            requestError(req, filename, "403", "Forbidden", "OS-HW3 Server could not read this file");
             return;
         }
-        requestServeStatic(fd, filename, sbuf.st_size);
+        requestServeStatic(req, filename, sbuf.st_size);
     } else
     {
         if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode))
         {
-            requestError(fd, filename, "403", "Forbidden", "OS-HW3 Server could not run this CGI program");
+            requestError(req, filename, "403", "Forbidden", "OS-HW3 Server could not run this CGI program");
             return;
         }
-        requestServeDynamic(fd, filename, cgiargs);
+        requestServeDynamic(req, filename, cgiargs);
     }
 }
 
