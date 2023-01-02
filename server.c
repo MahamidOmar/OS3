@@ -71,9 +71,9 @@ void *workThread(void *stat_thread)
 // HW3: Parse the new arguments too
 void getargs(int *port, int argc, char *argv[], int *total_threads, char *sched_name, int *queue_size)
 {
-    if (argc < 2)
+    if (argc != 5)
     {
-        fprintf(stderr, "Usage: %s <port>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <port> <threads> <queue_size> <schedalg>\n", argv[0]);
         exit(1);
     }
     *port = atoi(argv[1]);

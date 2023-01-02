@@ -191,6 +191,7 @@ Queue removeHalfElementsRandomly(Queue q, Queue deletedNodes)
     QueueNode temp = q->head;
     unsigned int index = 0;
 
+    // maybe here error
     while (temp)
     {
         if (indexArray[index] == 1)
