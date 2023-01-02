@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 
         scheduleNextRequest(queue_size, connfd, sched_name, req);
 
-        pthread_cond_signal(&normal_cond);
+        pthread_cond_signal(&block_cond);
         pthread_mutex_unlock(&queue_lock);
     }
 
