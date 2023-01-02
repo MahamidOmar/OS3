@@ -70,18 +70,6 @@ build CMakeFiles/OS3.dir/server.c.o: C_COMPILER__OS3_Debug /Users/aymanbarham/CL
   OBJECT_DIR = CMakeFiles/OS3.dir
   OBJECT_FILE_DIR = CMakeFiles/OS3.dir
 
-build CMakeFiles/OS3.dir/output.c.o: C_COMPILER__OS3_Debug /Users/aymanbarham/CLionProjects/OS3/output.c || cmake_object_order_depends_target_OS3
-  DEP_FILE = CMakeFiles/OS3.dir/output.c.o.d
-  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -fcolor-diagnostics -std=gnu99
-  OBJECT_DIR = CMakeFiles/OS3.dir
-  OBJECT_FILE_DIR = CMakeFiles/OS3.dir
-
-build CMakeFiles/OS3.dir/client.c.o: C_COMPILER__OS3_Debug /Users/aymanbarham/CLionProjects/OS3/client.c || cmake_object_order_depends_target_OS3
-  DEP_FILE = CMakeFiles/OS3.dir/client.c.o.d
-  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -fcolor-diagnostics -std=gnu99
-  OBJECT_DIR = CMakeFiles/OS3.dir
-  OBJECT_FILE_DIR = CMakeFiles/OS3.dir
-
 build CMakeFiles/OS3.dir/stat_thread.c.o: C_COMPILER__OS3_Debug /Users/aymanbarham/CLionProjects/OS3/stat_thread.c || cmake_object_order_depends_target_OS3
   DEP_FILE = CMakeFiles/OS3.dir/stat_thread.c.o.d
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -fcolor-diagnostics -std=gnu99
@@ -96,7 +84,7 @@ build CMakeFiles/OS3.dir/stat_thread.c.o: C_COMPILER__OS3_Debug /Users/aymanbarh
 #############################################
 # Link the executable OS3
 
-build OS3: C_EXECUTABLE_LINKER__OS3_Debug CMakeFiles/OS3.dir/queue.c.o CMakeFiles/OS3.dir/request.c.o CMakeFiles/OS3.dir/segel.c.o CMakeFiles/OS3.dir/server.c.o CMakeFiles/OS3.dir/output.c.o CMakeFiles/OS3.dir/client.c.o CMakeFiles/OS3.dir/stat_thread.c.o
+build OS3: C_EXECUTABLE_LINKER__OS3_Debug CMakeFiles/OS3.dir/queue.c.o CMakeFiles/OS3.dir/request.c.o CMakeFiles/OS3.dir/segel.c.o CMakeFiles/OS3.dir/server.c.o CMakeFiles/OS3.dir/stat_thread.c.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk
   OBJECT_DIR = CMakeFiles/OS3.dir
   POST_BUILD = :

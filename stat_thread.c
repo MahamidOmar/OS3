@@ -4,7 +4,7 @@
 
 #include "stat_thread.h"
 
-typedef struct statThread_t
+struct statThread_t
 {
     int id;
     int count;
