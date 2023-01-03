@@ -157,17 +157,17 @@ Queue removeHalfElementsRandomly(Queue q, Queue deletedNodes)
         return q;
     }
 
-    unsigned int numToDelete = q->currentSize / 2;
-    unsigned int randomIndex, j;
+    int numToDelete = q->maxSize / 2;
+    int randomIndex, j;
 
-    numToDelete = q->currentSize - numToDelete;
+    numToDelete = q->maxSize - numToDelete;
 
-    unsigned int* indexArray = malloc(sizeof(*indexArray) * q->currentSize);
+    int* indexArray = malloc(sizeof(*indexArray) * q->maxSize);
     if (!indexArray) {
         exit(1);
     }
     // init to zeroes
-    for (int i = 0; i < q->currentSize; ++i)
+    for (int i = 0; i < q->maxSize; ++i)
     {
         indexArray[i] = 0;
     }
@@ -176,7 +176,7 @@ Queue removeHalfElementsRandomly(Queue q, Queue deletedNodes)
     j = numToDelete;
     while (j != 0)
     {
-        randomIndex = rand() % q->currentSize;
+        randomIndex = rand() % q->maxSize;
         if (indexArray[randomIndex] == 1)
         {
             continue;
