@@ -157,34 +157,44 @@ Queue removeHalfElementsRandomly(Queue q, Queue deletedNodes)
         return q;
     }
 
-    int numToDelete = q->maxSize / 2;
+    int numToDelete = q->currentSize / 2;
     int randomIndex, j;
 
-    numToDelete = q->maxSize - numToDelete;
+    numToDelete = q->currentSize - numToDelete;
 
-    int* indexArray = malloc(sizeof(*indexArray) * q->maxSize);
+    int* indexArray = malloc(sizeof(*indexArray) * q->currentSize);
     if (!indexArray) {
         exit(1);
     }
     // init to zeroes
-    for (int i = 0; i < q->maxSize; ++i)
+    for (int i = 0; i < q->currentSize; ++i)
     {
         indexArray[i] = 0;
     }
 
     srand(time(NULL));
     j = numToDelete;
-    while (j != 0)
-    {
-        randomIndex = rand() % q->maxSize;
-        if (indexArray[randomIndex] == 1)
-        {
-            continue;
-        }
-        indexArray[randomIndex] = 1;
-        j--;
-    }
+//    while (j != 0)
+//    {
+//        randomIndex = rand() % q->currentSize;
+//        if (indexArray[randomIndex] == 1)
+//        {
+//            continue;
+//        }
+//        indexArray[randomIndex] = 1;
+//        j--;
+//    }
 
+    srand(time(0));
+    for(int i = 0; i < numToDelete; i++){
+        randomIndex = rand() % (q -> currentSize);
+        if(indexArray[randomIndex] == 1){
+            i--;
+        }
+        else{
+            indexArray[randomIndex] = 1;
+        }
+    }
     Queue remainingQueue = createQueue(q->maxSize, q->copyFunc, q->freeFunc);
     QueueNode temp = q->head;
     unsigned int index = 0;
