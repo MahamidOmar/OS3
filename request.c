@@ -273,7 +273,7 @@ Request createRequest(int fd, Time arrive_time)
 
     newRequest->fd = fd;
     newRequest->arrive_time = arrive_time;
-    newRequest->dispatch_time = NULL;
+    newRequest->dispatch_time = malloc(sizeof(*newRequest->dispatch_time));
     newRequest->st = NULL;
 
     return newRequest;
@@ -313,9 +313,8 @@ void setDispatchRequest(Request request, Time new_dispatch_time)
 {
     struct timeval *dispatch= malloc(sizeof(*dispatch));
     timersub (new_dispatch_time , request->arrive_time, dispatch);
-    request->dispatch_time = dispatch;
-//    request -> dispatch_time->tv_sec = dispatch->tv_sec;
-//    request -> dispatch_time->tv_usec = dispatch->tv_usec;
+    request -> dispatch_time->tv_sec = dispatch->tv_sec;
+    request -> dispatch_time->tv_usec = dispatch->tv_usec;
 }
 
 void requestSetThread(Request request, StatThread new_thread)
