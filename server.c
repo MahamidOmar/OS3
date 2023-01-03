@@ -197,9 +197,9 @@ void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Request r
 
         while (!isEmptyQueue(deleted_vals))
         {
-            tmp_request = topElement(request_queue);
+            tmp_request = topElement(deleted_vals);
             Close(getFdRequest(tmp_request));
-            dequeElement(request_queue);
+            dequeElement(deleted_vals);
             destroyRequest(tmp_request);
         }
 
@@ -207,5 +207,3 @@ void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Request r
         return;
     }
 }
-
- 
