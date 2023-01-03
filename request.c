@@ -195,7 +195,7 @@ void requestServeStatic(Request req, char *filename, int filesize)
     sprintf(buf, "HTTP/1.0 200 OK\r\n");
     sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
     sprintf(buf, "%sContent-Length: %d\r\n", buf, filesize);
-    sprintf(buf, "%sContent-Type: %s\r\n", buf, filetype);
+    sprintf(buf, "%sContent-Type: %s\r\n\r\n", buf, filetype);
 
     sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, req->arrive_time->tv_sec, req->arrive_time->tv_usec);
     sprintf(buf, "%sStat-Req-Dispatch:: %lu.%06lu\r\n", buf, req->dispatch_time->tv_sec, req->dispatch_time->tv_usec);
