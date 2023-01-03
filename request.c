@@ -162,7 +162,8 @@ void requestServeDynamic(Request req, char *filename, char *cgiargs)
     sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n", buf, getThreadDynamicCount(req->st));
     Rio_writen(fd, buf, strlen(buf));
 
-    if (Fork() == 0)
+    int pid = Fork();
+    if (pid == 0)
     {
         /* Child process */
         Setenv("QUERY_STRING", cgiargs, 1);
@@ -170,7 +171,7 @@ void requestServeDynamic(Request req, char *filename, char *cgiargs)
         Dup2(fd, STDOUT_FILENO);
         Execve(filename, emptylist, environ);
     }
-    Wait(NULL);
+    WaitPid(pid, NULL, 0);
 }
 
 
