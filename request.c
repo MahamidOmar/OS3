@@ -313,8 +313,9 @@ void setDispatchRequest(Request request, Time new_dispatch_time)
 {
     struct timeval *dispatch= malloc(sizeof(*dispatch));
     timersub (new_dispatch_time , request->arrive_time, dispatch);
-    request -> dispatch_time->tv_sec = dispatch->tv_sec;
-    request -> dispatch_time->tv_usec = dispatch->tv_usec;
+    request->dispatch_time = dispatch;
+//    request -> dispatch_time->tv_sec = dispatch->tv_sec;
+//    request -> dispatch_time->tv_usec = dispatch->tv_usec;
 }
 
 void requestSetThread(Request request, StatThread new_thread)
