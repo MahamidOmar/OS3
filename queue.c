@@ -157,7 +157,7 @@ Queue removeHalfElementsRandomly(Queue q, Queue deletedNodes)
         return q;
     }
 
-    int numToDelete = q->currentSize / 2;
+    int numToDelete = q->currentSize * 0.5;
     int randomIndex, j;
 
     numToDelete = q->currentSize - numToDelete;
