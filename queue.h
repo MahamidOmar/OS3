@@ -16,7 +16,7 @@ typedef void (*freeElement)(Element);
 Queue createQueue(unsigned int maxSize, copyElement copyFunc, freeElement freeFunc);
 void freeQueue(Queue q);
 bool isEmptyQueue(Queue q);
-//bool isFullQueue(Queue);
+bool isFullQueue(Queue);
 unsigned int getSizeQueue(Queue q);
 void addElement(Queue q, Element value);
 void dequeElement(Queue q);

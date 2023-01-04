@@ -144,7 +144,10 @@ void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Request r
     }
     if (!strcmp(sched_name, "block"))
     {
-        pthread_cond_wait(&block_cond, &queue_lock);
+        while (isFullQueue(request_queue))
+        {
+            pthread_cond_wait(&block_cond, &queue_lock);
+        }
         addElement(request_queue, request);
         return;
     }
