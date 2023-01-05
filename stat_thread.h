@@ -7,6 +7,14 @@
 #include "stdlib.h"
 
 typedef struct statThread_t* StatThread;
+struct statThread_t
+{
+    int id;
+    int count;
+    int staticCount;
+    int dynamicCount;
+};
+
 StatThread createStatThread(int threadId);
 void increaseThreadCount(StatThread st);
 void increaseDynamicCount(StatThread st);

@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
     // init threads and their statistics
     pthread_t *threads = malloc(sizeof(pthread_t) * total_thread_num);
-    StatThread *sts = malloc(sizeof(pthread_t) * total_thread_num);
+    StatThread *sts = malloc(sizeof(struct statThread_t) * total_thread_num);
     int i = 0;
     while (i < total_thread_num)
     {

@@ -4,13 +4,6 @@
 
 #include "stat_thread.h"
 
-struct statThread_t
-{
-    int id;
-    int count;
-    int staticCount;
-    int dynamicCount;
-};
 
 StatThread createStatThread(int threadId)
 {
