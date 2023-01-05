@@ -62,7 +62,8 @@ void *workThread(void *stat_thread)
 
         pthread_mutex_lock(&queue_lock);
         --current_working_num_threads;
-        pthread_cond_broadcast(&block_cond);
+        pthread_cond_signal(&block_cond);
+        pthread_cond_signal(&normal_cond);
         pthread_mutex_unlock(&queue_lock);
     }
     return NULL;
