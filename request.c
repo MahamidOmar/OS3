@@ -151,7 +151,7 @@ void requestServeDynamic(Request req, char *filename, char *cgiargs)
 
     // The server does only a little bit of the header.
     // The CGI script has to finish writing out the header.
-    sprintf(buf, "%sHTTP/1.0 200 OK\r\n", buf);
+    sprintf(buf, "HTTP/1.0 200 OK\r\n");
     sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
 
     sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, req->arrive_time->tv_sec, req->arrive_time->tv_usec);
