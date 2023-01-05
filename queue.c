@@ -1,179 +1,217 @@
-#include <stdlib.h>
-#include <assert.h>
+//
+// Created by Ayman Barham on 01/01/2023.
+//
 #include "queue.h"
+#include <stdlib.h>
 
+struct QueueNode_t
+{
+    Element data;
+    struct QueueNode_t *next;
+};
+typedef struct QueueNode_t *QueueNode;
 
-struct Node{
-    Element value;
-    struct Node* next;
+struct queue
+{
+    int currentSize;
+    int maxSize;
+    QueueNode head;
+    QueueNode tail;
+    copyElement copyFunc;
+    freeElement freeFunc;
 };
 
-struct queue{
-    int size;
-    int max_size;
-    struct Node* start;
-    struct Node* end;
-    copyElement copyElement;
-    freeElement freeElement;
-};
-
-Queue createQueue(int capacity, copyElement copyFunction, freeElement freeFunction){
-    if(!copyFunction || !freeFunction){
+Queue createQueue(unsigned int maxSize, copyElement copyFunc, freeElement freeFunc)
+{
+    if (!copyFunc || !freeFunc)
+    {
         return NULL;
     }
-    Queue new_queue = malloc(sizeof(*new_queue));
-    if(new_queue == NULL){
-        return new_queue;
+    Queue q = malloc(sizeof(*q));
+    if (!q)
+    {
+        return NULL;
     }
 
-    new_queue -> size = 0;
-    new_queue -> max_size = capacity;
-    new_queue -> start = NULL;
-    new_queue -> end = NULL;
-    new_queue -> copyElement = copyFunction;
-    new_queue -> freeElement = freeFunction;
-    return new_queue;
+    q->maxSize = maxSize;
+    q->currentSize = 0;
+    q->head = NULL;
+    q->tail = NULL;
+    q->copyFunc = copyFunc;
+    q->freeFunc = freeFunc;
+
+    return q;
 }
 
-void freeQueue(Queue q){
-    if(q == NULL){
+void freeQueue(Queue q)
+{
+    if (!q)
+    {
         return;
     }
 
-    while(!isEmptyQueue(q)){
-        dequeElement(q);
+    QueueNode tmp = q->head;
+    QueueNode toDelete = q->head;
+    while (tmp)
+    {
+        tmp = tmp->next;
+        q->freeFunc(toDelete->data);
+        free(toDelete);
+        toDelete = tmp;
     }
-
     free(q);
 }
 
-bool isEmptyQueue(Queue q){
-    assert(q);
-    if(q -> size == 0){
+bool isEmptyQueue(Queue q)
+{
+    // q is not NULL
+    if (q->currentSize != 0)
+    {
+        return false;
+    }
+    return true;
+}
+
+bool isFullQueue(Queue q)
+{
+    // q is not NULL
+    if (q->currentSize == q->maxSize)
+    {
         return true;
     }
     return false;
 }
 
-bool isFullQueue(Queue q){
-    assert(q);
-    if(q -> size == q -> max_size){
-        return true;
+unsigned int getSizeQueue(Queue q)
+{
+    // q is not NULL
+    return q->currentSize;
+}
+
+// before adding we must check if full
+void addElement(Queue q, Element value)
+{
+    // q is not NULL
+    QueueNode toAdd = malloc(sizeof(*toAdd));
+    Element data = q->copyFunc(value);
+
+    if (!toAdd || !data)
+    { // bad alloc
+        return;
     }
-    return false;
+    toAdd->data = data;
+    toAdd->next = NULL;
+
+    // if empty
+    if (isEmptyQueue(q))
+    {
+        q->head = toAdd;
+        q->tail = toAdd;
+    } else
+    {
+        q->tail->next = toAdd;
+        q->tail = toAdd;
+    }
+
+    q->currentSize++;
 }
 
-int getSizeQueue(Queue q){
-    assert(q);
-    return q -> size;
-}
-
-//int queueGetMaxSize(Queue q){
-//    assert(q);
-//    return q -> max_size;
-//}
-
-void addElement(Queue q, Element value){
-//    if(q == NULL){
-//        return QUEUE_BAD_ARGUMENT;
-//    }
-//    if(q -> size + 1 > q -> max_size){
-//        return QUEUE_FULL;
-//    }
-
-    struct Node* new_node = malloc(sizeof(struct Node));
-    Element new_element = q -> copyElement(value);
-
-//    if(new_node == NULL || new_element == NULL){
-//        return QUEUE_OPERATION_FAIL;
-//    }
-
-    new_node -> value = new_element;
-    new_node -> next = NULL;
-
-    if(q -> start == NULL){
-        q -> start = new_node;
-        q -> end = new_node;
-        q -> size = 1;
+void dequeElement(Queue q)
+{
+    // q is not NULL
+    if (isEmptyQueue(q))
+    {
         return;
     }
 
-    q -> end -> next = new_node;
-    q -> end = new_node;
-    q -> size += 1;
+    QueueNode toRemove = q->head;
+    // if only 1
+    if (getSizeQueue(q) == 1)
+    {
+        q->tail = NULL;
+    }
+    //sss
+
+    q->head = q->head->next;
+    q->currentSize--;
+
+    q->freeFunc(toRemove->data);
+    free(toRemove);
 
 }
 
-void dequeElement(Queue q){
-//    if(q == NULL){
-//        return QUEUE_BAD_ARGUMENT;
-//    }
-//    if(q -> size == 0){
-//        return QUEUE_EMPTY;
-//    }
-
-    struct Node* tmp = NULL;
-
-    tmp = q -> start;
-    q -> start = q -> start -> next;
-    q -> size -= 1;
-    q -> freeElement(tmp -> value);
-    free(tmp);
-//    return QUEUE_SUCCESS;
-}
-
-Element topElement(Queue q){
-//    if(q == NULL || value == NULL){
-//        return QUEUE_BAD_ARGUMENT;
-//    }
-//    if(q -> size == 0){
-//        return QUEUE_EMPTY;
-//    }
-    return q -> copyElement(q -> start -> value);
-
-}
-
-Queue removeHalfElementsRandomly(Queue q, Queue removed){
-    if(q == NULL){
+Element topElement(Queue q)
+{
+    // q is not NULL
+    if (isEmptyQueue(q))
+    {
         return NULL;
     }
-    if(q -> size == 0){
-        return NULL;
+    return q->copyFunc(q->head->data);
+}
+
+Queue removeHalfElementsRandomly(Queue q, Queue deletedNodes)
+{
+    // q is not NULL
+    if (isEmptyQueue(q)) {
+        return q;
     }
 
-    int i, r;
-    int *indexes_to_remove = (int *)malloc(sizeof(int) * (q->size));
-    for(int i = 0; i < q->size; i++){
-        indexes_to_remove[i] = 0;
+    int numToDelete = q->currentSize / 2;
+    int randomIndex, j;
+
+    numToDelete = q->currentSize - numToDelete;
+
+    int* indexArray = malloc(sizeof(*indexArray) * q->currentSize);
+    if (!indexArray) {
+        exit(1);
+    }
+    // init to zeroes
+    for (int i = 0; i < q->currentSize; ++i)
+    {
+        indexArray[i] = 0;
     }
 
-    // Calculate the ceiling of 30% of the size 
-    int required_reduction = (q -> size) * 0.5;
-    required_reduction = (q -> size) - required_reduction;
+    srand(time(NULL));
+    j = numToDelete;
+//    while (j != 0)
+//    {
+//        randomIndex = rand() % q->currentSize;
+//        if (indexArray[randomIndex] == 1)
+//        {
+//            continue;
+//        }
+//        indexArray[randomIndex] = 1;
+//        j--;
+//    }
 
-    srand(time(0));
-    for(i = 0; i < required_reduction; i++){
-        r = rand() % (q -> size);
-        if(indexes_to_remove[r] == 1){
+    for(int i = 0; i < numToDelete; i++){
+        randomIndex = rand() % (q -> currentSize);
+        if(indexArray[randomIndex] == 1){
             i--;
         }
         else{
-            indexes_to_remove[r] = 1;
+            indexArray[randomIndex] = 1;
         }
     }
-    
-    Queue modified_queue = createQueue(q->max_size, q->copyElement, q->freeElement);
-    struct Node *runner = q -> start;
-    for(i = 0; i < q->size; i++){
-        if(indexes_to_remove[i] == 0){
-            addElement(modified_queue, runner->value);
+    Queue remainingQueue = createQueue(q->maxSize, q->copyFunc, q->freeFunc);
+    QueueNode temp = q->head;
+    unsigned int index = 0;
+
+    // maybe here error
+    while (temp)
+    {
+        if (indexArray[index] == 1)
+        {
+            addElement(deletedNodes, temp->data);
+        } else {
+            addElement(remainingQueue, temp->data);
         }
-        else{
-            addElement(removed, runner->value);
-        }
-        runner = runner -> next;
+        ++index;
+        temp = temp->next;
     }
 
-    free(indexes_to_remove);
-    return modified_queue;
+    free(indexArray);
+
+    return remainingQueue;
 }

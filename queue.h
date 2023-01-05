@@ -13,11 +13,11 @@ typedef void* Element;
 typedef Element (*copyElement)(Element);
 typedef void (*freeElement)(Element);
 
-Queue createQueue(int maxSize, copyElement copyFunc, freeElement freeFunc);
+Queue createQueue(unsigned int maxSize, copyElement copyFunc, freeElement freeFunc);
 void freeQueue(Queue q);
 bool isEmptyQueue(Queue q);
 bool isFullQueue(Queue);
-int getSizeQueue(Queue q);
+unsigned int getSizeQueue(Queue q);
 void addElement(Queue q, Element value);
 void dequeElement(Queue q);
 Element topElement(Queue q);
