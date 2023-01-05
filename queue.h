@@ -17,7 +17,7 @@ Queue createQueue(unsigned int maxSize, copyElement copyFunc, freeElement freeFu
 void freeQueue(Queue q);
 bool isEmptyQueue(Queue q);
 bool isFullQueue(Queue);
-unsigned int getSizeQueue(Queue q);
+int getSizeQueue(Queue q);
 void addElement(Queue q, Element value);
 void dequeElement(Queue q);
 Element topElement(Queue q);
