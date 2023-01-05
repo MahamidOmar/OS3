@@ -13,7 +13,7 @@ typedef void* Element;
 typedef Element (*copyElement)(Element);
 typedef void (*freeElement)(Element);
 
-Queue createQueue(unsigned int maxSize, copyElement copyFunc, freeElement freeFunc);
+Queue createQueue(int maxSize, copyElement copyFunc, freeElement freeFunc);
 void freeQueue(Queue q);
 bool isEmptyQueue(Queue q);
 bool isFullQueue(Queue);

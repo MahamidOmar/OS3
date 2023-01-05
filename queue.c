@@ -17,7 +17,7 @@ struct queue{
     freeElement freeElement;
 };
 
-Queue queueCreate(int capacity, copyElement copyFunction, freeElement freeFunction){
+Queue createQueue(int capacity, copyElement copyFunction, freeElement freeFunction){
     if(!copyFunction || !freeFunction){
         return NULL;
     }
@@ -35,7 +35,7 @@ Queue queueCreate(int capacity, copyElement copyFunction, freeElement freeFuncti
     return new_queue;
 }
 
-void queueFree(Queue q){
+void freeQueue(Queue q){
     if(q == NULL){
         return;
     }
@@ -162,7 +162,7 @@ Queue removeHalfElementsRandomly(Queue q, Queue removed){
         }
     }
     
-    Queue modified_queue = queueCreate(q->max_size, q->copyElement, q->freeElement);
+    Queue modified_queue = createQueue(q->max_size, q->copyElement, q->freeElement);
     struct Node *runner = q -> start;
     for(i = 0; i < q->size; i++){
         if(indexes_to_remove[i] == 0){
