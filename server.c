@@ -1,17 +1,8 @@
 #include "segel.h"
 #include "request.h"
-#include "queue.h"
 #include <pthread.h>
-
-// The maximum length of sched alg param string
-#define MAXALGNAME 7
-
-// Global Variables to manage the thread pool
-pthread_mutex_t mutex;
-pthread_cond_t cond;
-pthread_cond_t full_cond;
-int working_threads_counter;
-Queue pending_queue;
+#include "queue.h"
+#include "stat_thread.h"
 
 // 
 // server.c: A very, very simple web server
@@ -23,159 +14,199 @@ Queue pending_queue;
 // Most of the work is done within routines written in request.c
 //
 
-// HW3: Parse the new arguments too
-void getargs(int *port, int *num_of_thread, int *q_size, char* sched_alg, int argc, char *argv[])
+// helper func
+void scheduleNextRequest(int pending_requests_size, int connfd, char* sched_name, Request request);
+//
+
+pthread_mutex_t queue_lock;
+pthread_cond_t normal_cond;
+pthread_cond_t block_cond;
+int current_working_num_threads;
+Queue request_queue;
+
+void *workThread(void *stat_thread)
 {
-    if (argc != 5) {
-        fprintf(stderr, "Usage: %s <port> <threads> <queue_size> <schedalg>\n", argv[0]);
-        exit(1);
-    }
-    *port = atoi(argv[1]);
-    *num_of_thread = atoi(argv[2]);
-    *q_size = atoi(argv[3]);
-    strcpy(sched_alg, argv[4]);
-}
-
-void *thread_work_function(void* arg){
-    struct timeval* pickup = malloc(sizeof(*pickup));
-
+    StatThread st = (StatThread) stat_thread;
+    Time received_time = malloc(sizeof(struct timeval)); // maybe put this in while
     Request request;
+    while(1)
+    {
+        pthread_mutex_lock(&queue_lock);
+        for (; isEmptyQueue(request_queue);)
+        {
+            pthread_cond_wait(&normal_cond, &queue_lock);
+        }
 
-    while(1){
-        pthread_mutex_lock(&mutex);
+        // get the time of day.
+        gettimeofday(received_time, NULL);
+        // get the request
+        request = topElement(request_queue);
+        dequeElement(request_queue);
 
-        while(isEmptyQueue(pending_queue))
-            pthread_cond_wait(&cond, &mutex);
+        // update statistics
+        increaseThreadCount(st);
+        setDispatchRequest(request, received_time);
+        requestSetThread(request, st);
 
-        // get the pickup time
-        gettimeofday(pickup, NULL);
+        // count workers
+        ++current_working_num_threads;
 
-        // get request from queue
-        request = topElement(pending_queue);
-        dequeElement(pending_queue);
+        pthread_mutex_unlock(&queue_lock);
 
-        // update dispatch time and stat_thread in request
-        increaseStaticCount((StatThread)arg);
-        setDispatchRequest(request, pickup);
-        requestSetThread(request, (StatThread)arg);
-
-        // increase working count
-        working_threads_counter += 1;
-
-        pthread_mutex_unlock(&mutex);
-
-        // Check if the pulled work from queue isn't NULL.
-        // Then add to the working queue, and handle the job.
-        if(request != NULL){
+        if (request)
+        {
             requestHandle(request);
             Close(getFdRequest(request));
             destroyRequest(request);
         }
 
-        // lock and decrease the counter then unlock
-        // And tell the main thread that a thread is free again
-        pthread_mutex_lock(&mutex);
-        working_threads_counter -= 1;
-        pthread_cond_signal(&full_cond);
-        pthread_mutex_unlock(&mutex);
-        
+        pthread_mutex_lock(&queue_lock);
+        --current_working_num_threads;
+        pthread_cond_signal(&block_cond);
+        pthread_mutex_unlock(&queue_lock);
     }
     return NULL;
+}
+
+// HW3: Parse the new arguments too
+void getargs(int *port, int argc, char *argv[], int *total_threads, char *sched_name, int *queue_size)
+{
+    if (argc != 5)
+    {
+        fprintf(stderr, "Usage: %s <port> <threads> <queue_size> <schedalg>\n", argv[0]);
+        exit(1);
+    }
+    *port = atoi(argv[1]);
+    *total_threads = atoi(argv[2]);
+    *queue_size = atoi(argv[3]);
+    strcpy(sched_name, argv[4]);
 }
 
 
 int main(int argc, char *argv[])
 {
-    Queue tmp_queue, removed_vals_queue;
-    int listenfd, connfd, port, clientlen, num_of_threads, q_size;
-    char sched_alg[MAXALGNAME];
-    Request request, tmp;
+    int listenfd, connfd, port, clientlen;
+    int total_thread_num, queue_size;
     struct sockaddr_in clientaddr;
+    char sched_name[7]; // 7 because random is biggest string;
+    Request req;
 
-    getargs(&port, &num_of_threads, &q_size, sched_alg, argc, argv);
+    getargs(&port, argc, argv, &total_thread_num, sched_name, &queue_size);
 
-    // Initializing global variables
-    pthread_mutex_init(&mutex, NULL);
-    pthread_cond_init(&cond, NULL);
-    pthread_cond_init(&full_cond, NULL);
-    working_threads_counter = 0;
-    pending_queue = createQueue(q_size, copyRequest, destroyRequest);
+    // init the locks and queues
+    pthread_mutex_init(&queue_lock, NULL);
+    pthread_cond_init(&normal_cond, NULL);
+    pthread_cond_init(&block_cond, NULL);
+    current_working_num_threads = 0;
+    request_queue = createQueue(queue_size, copyRequest, destroyRequest);
 
-    pthread_t *threads = malloc(sizeof(pthread_t) * num_of_threads);
-    StatThread *stat_threads = malloc(sizeof(*stat_threads) * num_of_threads);
-    for(int i = 0; i < num_of_threads; i++){
-        stat_threads[i] = createStatThread(i);
-        pthread_create(&threads[i], NULL, thread_work_function, stat_threads[i]);
+    // init threads and their statistics
+    pthread_t *threads = malloc(sizeof(pthread_t) * total_thread_num);
+    StatThread *sts = malloc(sizeof(pthread_t) * total_thread_num);
+    int i = 0;
+    while (i < total_thread_num)
+    {
+        sts[i] = createStatThread(i);
+        pthread_create(&threads[i], NULL, workThread, sts[i]);
+        ++i;
     }
 
+    // start the work
     listenfd = Open_listenfd(port);
-    while (1) {
+    while (1)
+    {
         clientlen = sizeof(clientaddr);
-        connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
-        struct timeval *arrival_time = malloc(sizeof(*arrival_time));
-        gettimeofday(arrival_time, NULL);
-       
-        request = createRequest(connfd, arrival_time);
-    
-        pthread_mutex_lock(&mutex);
-        if(working_threads_counter + getSizeQueue(pending_queue) >= q_size){
-            if(!strcmp(sched_alg, "block")){
-                pthread_cond_wait(&full_cond, &mutex);
-                addElement(pending_queue, request);
-            }
-            else if(!strcmp(sched_alg, "dt")){
-                destroyRequest(request);
-                Close(connfd);
-            }
-            else if(!strcmp(sched_alg, "dh")){
-                if(isEmptyQueue(pending_queue)){
-                    destroyRequest(request);
-                    Close(connfd);
-                }
-                else{
-                    tmp = topElement(pending_queue);
-                    Close(getFdRequest(tmp));
-                    dequeElement(pending_queue);
-                    addElement(pending_queue, request);
-                    destroyRequest(tmp);
-                }
-            }
-            else if(strcmp(sched_alg, "random") == 0){
-                if(!isEmptyQueue(pending_queue)){
-                    removed_vals_queue = createQueue(q_size, copyRequest, destroyRequest);
-                    tmp_queue = pending_queue;
-                    pending_queue = removeHalfElementsRandomly(pending_queue, removed_vals_queue);
-                    freeQueue(tmp_queue);
-                    fprintf(stderr, "Queue Size after random: %d", getSizeQueue(pending_queue));
-                    addElement(pending_queue, request);
+        connfd = Accept(listenfd, (SA *) &clientaddr, (socklen_t *) &clientlen);
+        Time arrive_time = malloc(sizeof(*arrive_time));
+        gettimeofday(arrive_time, NULL);
 
-                    // remove all not needed values
-                    while(!isEmptyQueue(removed_vals_queue)){
-                        tmp = topElement(removed_vals_queue);
-                        Close(getFdRequest(tmp));
-                        dequeElement(removed_vals_queue);
-                        destroyRequest(tmp);
-                    }
-                    freeQueue(removed_vals_queue);
-                }
-                else{
-                    destroyRequest(request);
-                    Close(connfd);
-                }
-            }
-        }
-        else{
-            addElement(pending_queue, request);
-        }
-        pthread_cond_signal(&cond);
-        pthread_mutex_unlock(&mutex);
+        req = createRequest(connfd, arrive_time);
+
+        pthread_mutex_lock(&queue_lock);
+
+        scheduleNextRequest(queue_size, connfd, sched_name, req);
+
+        pthread_cond_signal(&normal_cond);
+        pthread_mutex_unlock(&queue_lock);
     }
+
     free(threads);
-    free(stat_threads);
+    free(sts);
 }
 
+void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Request request)
+{
+    Request tmp_request;
+    if (current_working_num_threads + getSizeQueue(request_queue) < queue_size)
+    {
+        addElement(request_queue,request);
+        return;
+    }
+    if (!strcmp(sched_name, "block"))
+    {
+        while (isFullQueue(request_queue))
+        {
+            pthread_cond_wait(&block_cond, &queue_lock);
+        }
+        addElement(request_queue, request);
+        return;
+    }
+    if (!strcmp(sched_name, "dt"))
+    {
+        destroyRequest(request);
+        Close(connfd);
+        return;
+    }
+    if (!strcmp(sched_name, "dh"))
+    {
+        if (isEmptyQueue(request_queue))
+        {
+            destroyRequest(request);
+            Close(connfd);
+            return;
+        }
 
-    
+        // handle oldest request
+        tmp_request = topElement(request_queue);
+        Close(getFdRequest(tmp_request));
+        dequeElement(request_queue);
+        destroyRequest(tmp_request);
 
+        // insert new request
+        addElement(request_queue, request);
+        return;
+    }
 
- 
+    if (!strcmp(sched_name, "random"))
+    {
+        if (isEmptyQueue(request_queue))
+        {
+            destroyRequest(request);
+            Close(connfd);
+            return;
+        }
+
+        Queue deleted_vals, old_queue;
+        deleted_vals = createQueue(queue_size, copyRequest, destroyRequest);
+        old_queue = request_queue;
+
+        request_queue = removeHalfElementsRandomly(request_queue, deleted_vals);
+
+        freeQueue(old_queue);
+
+        fprintf(stderr, "Queue Size after random: %d", getSizeQueue(request_queue));
+
+        addElement(request_queue, request);
+
+        while (!isEmptyQueue(deleted_vals))
+        {
+            tmp_request = topElement(deleted_vals);
+            Close(getFdRequest(tmp_request));
+            dequeElement(deleted_vals);
+            destroyRequest(tmp_request);
+        }
+
+        freeQueue(deleted_vals);
+        return;
+    }
+}
