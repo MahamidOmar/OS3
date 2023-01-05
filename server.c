@@ -144,7 +144,7 @@ void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Request r
     }
     if (!strcmp(sched_name, "block"))
     {
-        while (isFullQueue(request_queue))
+        while (getSizeQueue(request_queue) + current_working_num_threads >= queue_size)
         {
             pthread_cond_wait(&block_cond, &queue_lock);
         }
