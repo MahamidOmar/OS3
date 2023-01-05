@@ -37,7 +37,7 @@ void getargs(int *port, int *num_of_thread, int *q_size, char* sched_alg, int ar
 }
 
 void *thread_work_function(void* arg){
-    struct timeval pickup;
+    struct timeval* pickup = malloc(sizeof(*pickup));
 
     Request request;
 
@@ -48,7 +48,7 @@ void *thread_work_function(void* arg){
             pthread_cond_wait(&cond, &mutex);
 
         // get the pickup time
-        gettimeofday(&pickup, NULL);
+        gettimeofday(pickup, NULL);
 
         // get request from queue
         request = topElement(pending_queue);
@@ -56,7 +56,7 @@ void *thread_work_function(void* arg){
 
         // update dispatch time and stat_thread in request
         increaseStaticCount((StatThread)arg);
-        setDispatchRequest(request, &pickup);
+        setDispatchRequest(request, pickup);
         requestSetThread(request, (StatThread)arg);
 
         // increase working count
