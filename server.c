@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
     free(sts);
 }
 
-void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Request request)
+inline void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Request request)
 {
     Request tmp_request;
     if (current_working_num_threads + getSizeQueue(request_queue) < queue_size)
@@ -144,10 +144,10 @@ void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Request r
     }
     if (!strcmp(sched_name, "block"))
     {
-        while (getSizeQueue(request_queue) + current_working_num_threads >= queue_size)
-        {
+//        while (getSizeQueue(request_queue) + current_working_num_threads >= queue_size)
+//        {
             pthread_cond_wait(&block_cond, &queue_lock);
-        }
+//        }
         addElement(request_queue, request);
         return;
     }
