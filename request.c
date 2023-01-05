@@ -153,39 +153,13 @@ void requestServeDynamic(Request req, char *filename, char *cgiargs)
     // The CGI script has to finish writing out the header.
     sprintf(buf, "HTTP/1.0 200 OK\r\n");
     sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
 
-    sprintf(buf, "Stat-Req-Arrival:: %lu.%06lu\r\n", req->arrive_time->tv_sec, req->arrive_time->tv_usec);
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Req-Dispatch:: %lu.%06lu\r\n", req->dispatch_time->tv_sec, req->dispatch_time->tv_usec);
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Thread-Id:: %d\r\n",  getThreadId(req->st));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Thread-Count:: %d\r\n", getThreadCount(req->st));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Thread-Static:: %d\r\n", getThreadStaticCount(req->st));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Thread-Dynamic:: %d\r\n\r\n", getThreadDynamicCount(req->st));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-//    sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, req->arrive_time->tv_sec, req->arrive_time->tv_usec);
-//    sprintf(buf, "%sStat-Req-Dispatch:: %lu.%06lu\r\n", buf, req->dispatch_time->tv_sec, req->dispatch_time->tv_usec);
-//    sprintf(buf, "%sStat-Thread-Id:: %d\r\n", buf, getThreadId(req->st));
-//    sprintf(buf, "%sStat-Thread-Count:: %d\r\n", buf, getThreadCount(req->st));
-//    sprintf(buf, "%sStat-Thread-Static:: %d\r\n", buf, getThreadStaticCount(req->st));
-//    sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n", buf, getThreadDynamicCount(req->st));
+    sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, req->arrive_time->tv_sec, req->arrive_time->tv_usec);
+    sprintf(buf, "%sStat-Req-Dispatch:: %lu.%06lu\r\n", buf, req->dispatch_time->tv_sec, req->dispatch_time->tv_usec);
+    sprintf(buf, "%sStat-Thread-Id:: %d\r\n", buf, getThreadId(req->st));
+    sprintf(buf, "%sStat-Thread-Count:: %d\r\n", buf, getThreadCount(req->st));
+    sprintf(buf, "%sStat-Thread-Static:: %d\r\n", buf, getThreadStaticCount(req->st));
+    sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n", buf, getThreadDynamicCount(req->st));
     Rio_writen(fd, buf, strlen(buf));
 
     int pid = Fork();
@@ -223,38 +197,13 @@ void requestServeStatic(Request req, char *filename, int filesize)
     sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
     sprintf(buf, "%sContent-Length: %d\r\n", buf, filesize);
     sprintf(buf, "%sContent-Type: %s\r\n", buf, filetype);
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
 
-    sprintf(buf, "Stat-Req-Arrival:: %lu.%06lu\r\n", req->arrive_time->tv_sec, req->arrive_time->tv_usec);
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Req-Dispatch:: %lu.%06lu\r\n", req->dispatch_time->tv_sec, req->dispatch_time->tv_usec);
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Thread-Id:: %d\r\n",  getThreadId(req->st));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Thread-Count:: %d\r\n", getThreadCount(req->st));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Thread-Static:: %d\r\n", getThreadStaticCount(req->st));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Thread-Dynamic:: %d\r\n\r\n", getThreadDynamicCount(req->st));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-//    sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, req->arrive_time->tv_sec, req->arrive_time->tv_usec);
-//    sprintf(buf, "%sStat-Req-Dispatch:: %lu.%06lu\r\n", buf, req->dispatch_time->tv_sec, req->dispatch_time->tv_usec);
-//    sprintf(buf, "%sStat-Thread-Id:: %d\r\n", buf, getThreadId(req->st));
-//    sprintf(buf, "%sStat-Thread-Count:: %d\r\n", buf, getThreadCount(req->st));
-//    sprintf(buf, "%sStat-Thread-Static:: %d\r\n", buf, getThreadStaticCount(req->st));
-//    sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n\r\n", buf, getThreadDynamicCount(req->st));
+    sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, req->arrive_time->tv_sec, req->arrive_time->tv_usec);
+    sprintf(buf, "%sStat-Req-Dispatch:: %lu.%06lu\r\n", buf, req->dispatch_time->tv_sec, req->dispatch_time->tv_usec);
+    sprintf(buf, "%sStat-Thread-Id:: %d\r\n", buf, getThreadId(req->st));
+    sprintf(buf, "%sStat-Thread-Count:: %d\r\n", buf, getThreadCount(req->st));
+    sprintf(buf, "%sStat-Thread-Static:: %d\r\n", buf, getThreadStaticCount(req->st));
+    sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n\r\n", buf, getThreadDynamicCount(req->st));
 
     Rio_writen(fd, buf, strlen(buf));
 
