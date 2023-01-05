@@ -21,7 +21,7 @@ struct queue
     freeElement freeFunc;
 };
 
-Queue createQueue(unsigned int maxSize, copyElement copyFunc, freeElement freeFunc)
+Queue createQueue(int maxSize, copyElement copyFunc, freeElement freeFunc)
 {
     if (!copyFunc || !freeFunc)
     {
@@ -82,7 +82,7 @@ bool isFullQueue(Queue q)
     return false;
 }
 
-unsigned int getSizeQueue(Queue q)
+int getSizeQueue(Queue q)
 {
     // q is not NULL
     return q->currentSize;
@@ -174,29 +174,29 @@ Queue removeHalfElementsRandomly(Queue q, Queue deletedNodes)
 
     srand(time(NULL));
     j = numToDelete;
-//    while (j != 0)
-//    {
-//        randomIndex = rand() % q->currentSize;
-//        if (indexArray[randomIndex] == 1)
-//        {
-//            continue;
-//        }
-//        indexArray[randomIndex] = 1;
-//        j--;
-//    }
-
-    for(int i = 0; i < numToDelete; i++){
-        randomIndex = rand() % (q -> currentSize);
-        if(indexArray[randomIndex] == 1){
-            i--;
+    while (j != 0)
+    {
+        randomIndex = rand() % q->currentSize;
+        if (indexArray[randomIndex] == 1)
+        {
+            continue;
         }
-        else{
-            indexArray[randomIndex] = 1;
-        }
+        indexArray[randomIndex] = 1;
+        j--;
     }
+
+//    for(int i = 0; i < numToDelete; i++){
+//        randomIndex = rand() % (q -> currentSize);
+//        if(indexArray[randomIndex] == 1){
+//            i--;
+//        }
+//        else{
+//            indexArray[randomIndex] = 1;
+//        }
+//    }
     Queue remainingQueue = createQueue(q->maxSize, q->copyFunc, q->freeFunc);
     QueueNode temp = q->head;
-    unsigned int index = 0;
+    int index = 0;
 
     // maybe here error
     while (temp)
