@@ -27,10 +27,10 @@ Queue request_queue;
 void *workThread(void *stat_thread)
 {
     StatThread st = (StatThread) stat_thread;
-    Time received_time = malloc(sizeof(struct timeval)); // maybe put this in while
     Request request;
     while(1)
     {
+        Time received_time = malloc(sizeof(struct timeval)); // maybe put this in while
         pthread_mutex_lock(&queue_lock);
         for (; isEmptyQueue(request_queue);)
         {
@@ -144,10 +144,10 @@ inline void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Re
     }
     if (!strcmp(sched_name, "block"))
     {
-//        while (getSizeQueue(request_queue) + current_working_num_threads >= queue_size)
-//        {
+        while (getSizeQueue(request_queue) + current_working_num_threads >= queue_size)
+        {
             pthread_cond_wait(&block_cond, &queue_lock);
-//        }
+        }
         addElement(request_queue, request);
         return;
     }
