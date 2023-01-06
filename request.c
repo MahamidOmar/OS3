@@ -19,7 +19,6 @@ void requestError(Request req, char *cause, char *errnum, char *shortmsg, char *
 {
     int fd = getFdRequest(req);
     char buf[MAXLINE], body[MAXBUF];
-
     // Create the body of the error message
     sprintf(body, "<html><title>OS-HW3 Error</title>");
     sprintf(body, "%s<body bgcolor=""fffff"">\r\n", body);
@@ -27,7 +26,6 @@ void requestError(Request req, char *cause, char *errnum, char *shortmsg, char *
     sprintf(body, "%s<p>%s: %s\r\n", body, longmsg, cause);
     sprintf(body, "%s<hr>OS-HW3 Web Server\r\n", body);
 
-    increaseThreadCount(req->st);
     // Write out the header information for this response
     sprintf(buf, "HTTP/1.0 %s %s\r\n", errnum, shortmsg);
     Rio_writen(fd, buf, strlen(buf));
@@ -223,6 +221,7 @@ void requestHandle(Request req)
     char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];
     char filename[MAXLINE], cgiargs[MAXLINE];
     rio_t rio;
+    increaseThreadCount(req->st);
 
     Rio_readinitb(&rio, fd);
     Rio_readlineb(&rio, buf, MAXLINE);
