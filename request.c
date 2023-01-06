@@ -27,6 +27,7 @@ void requestError(Request req, char *cause, char *errnum, char *shortmsg, char *
     sprintf(body, "%s<p>%s: %s\r\n", body, longmsg, cause);
     sprintf(body, "%s<hr>OS-HW3 Web Server\r\n", body);
 
+    increaseThreadCount(req->st);
     // Write out the header information for this response
     sprintf(buf, "HTTP/1.0 %s %s\r\n", errnum, shortmsg);
     Rio_writen(fd, buf, strlen(buf));
