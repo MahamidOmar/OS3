@@ -59,12 +59,12 @@ void requestError(Request req, char *cause, char *errnum, char *shortmsg, char *
     Rio_writen(fd, buf, strlen(buf));
     printf("%s", buf);
 
-    sprintf(buf, "Content-Length: %lu\r\n\r\n", strlen(body)+20);
+    sprintf(buf, "Content-Length: %lu\r\n\r\n", strlen(body));
     Rio_writen(fd, buf, strlen(buf));
     printf("%s", buf);
 
     // Write out the content
-    Rio_writen(fd, body, strlen(body)+20);
+    Rio_writen(fd, body, strlen(body));
     printf("%s", body);
 
 }
@@ -194,7 +194,7 @@ void requestServeStatic(Request req, char *filename, int filesize)
     // put together response
     sprintf(buf, "HTTP/1.0 200 OK\r\n");
     sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
-    sprintf(buf, "%sContent-Length: %d\r\n", buf, filesize);
+    sprintf(buf, "%sContent-Length: %d\r\n", buf, filesize+20);
     sprintf(buf, "%sContent-Type: %s\r\n", buf, filetype);
 
     sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, req->arrive_time->tv_sec, req->arrive_time->tv_usec);
