@@ -221,7 +221,6 @@ void requestHandle(Request req)
     char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];
     char filename[MAXLINE], cgiargs[MAXLINE];
     rio_t rio;
-    increaseThreadCount(req->st);
 
     Rio_readinitb(&rio, fd);
     Rio_readlineb(&rio, buf, MAXLINE);
