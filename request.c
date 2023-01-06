@@ -31,37 +31,37 @@ void requestError(Request req, char *cause, char *errnum, char *shortmsg, char *
     Rio_writen(fd, buf, strlen(buf));
     printf("%s", buf);
 
-    sprintf(buf, "Stat-Req-Arrival:: %lu.%06lu\r\n", req->arrive_time->tv_sec, req->arrive_time->tv_usec);
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Req-Dispatch:: %lu.%06lu\r\n", req->dispatch_time->tv_sec, req->dispatch_time->tv_usec);
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Thread-Id:: %d\r\n",  getThreadId(req->st));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Thread-Count:: %d\r\n", getThreadCount(req->st));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Thread-Static:: %d\r\n", getThreadStaticCount(req->st));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Stat-Thread-Dynamic:: %d\r\n", getThreadDynamicCount(req->st));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Content-Type: text/html\r\n");
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
-
-    sprintf(buf, "Content-Length: %lu\r\n\r\n", strlen(body));
-    Rio_writen(fd, buf, strlen(buf));
-    printf("%s", buf);
+//    sprintf(buf, "Stat-Req-Arrival:: %lu.%06lu\r\n", req->arrive_time->tv_sec, req->arrive_time->tv_usec);
+//    Rio_writen(fd, buf, strlen(buf));
+//    printf("%s", buf);
+//
+//    sprintf(buf, "Stat-Req-Dispatch:: %lu.%06lu\r\n", req->dispatch_time->tv_sec, req->dispatch_time->tv_usec);
+//    Rio_writen(fd, buf, strlen(buf));
+//    printf("%s", buf);
+//
+//    sprintf(buf, "Stat-Thread-Id:: %d\r\n",  getThreadId(req->st));
+//    Rio_writen(fd, buf, strlen(buf));
+//    printf("%s", buf);
+//
+//    sprintf(buf, "Stat-Thread-Count:: %d\r\n", getThreadCount(req->st));
+//    Rio_writen(fd, buf, strlen(buf));
+//    printf("%s", buf);
+//
+//    sprintf(buf, "Stat-Thread-Static:: %d\r\n", getThreadStaticCount(req->st));
+//    Rio_writen(fd, buf, strlen(buf));
+//    printf("%s", buf);
+//
+//    sprintf(buf, "Stat-Thread-Dynamic:: %d\r\n", getThreadDynamicCount(req->st));
+//    Rio_writen(fd, buf, strlen(buf));
+//    printf("%s", buf);
+//
+//    sprintf(buf, "Content-Type: text/html\r\n");
+//    Rio_writen(fd, buf, strlen(buf));
+//    printf("%s", buf);
+//
+//    sprintf(buf, "Content-Length: %lu\r\n\r\n", strlen(body));
+//    Rio_writen(fd, buf, strlen(buf));
+//    printf("%s", buf);
 
 
 
