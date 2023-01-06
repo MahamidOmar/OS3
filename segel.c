@@ -80,17 +80,15 @@ pid_t Wait(int *status)
         unix_error("Wait error");
     return pid;
 }
-/* $end wait */
 
-/* $begin waitpid */
-pid_t WaitPid(pid_t pid ,int *status, int options)
+pid_t WaitPid(pid_t pid, int *status, int options)
 {
-    if((pid = waitpid(pid, status, options)) < 0){
-        unix_error("Wait error");
-    }
-    return pid;
+	if ((pid = waitpid(pid, status, options)) < 0) unix_error("Wait error");
+	return pid;
 }
-/* $end waitpid */
+
+
+/* $end wait */
 
 /********************************
  * Wrappers for Unix I/O routines
