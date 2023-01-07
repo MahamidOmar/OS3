@@ -291,8 +291,8 @@ void* copyRequest(void* request)
 void destroyRequest(void* request)
 {
     // maybe more frees? ########################################
-    free(getArriveTimeRequest(request));
-    free(((Request)request)->dispatch_time);
+//    free(getArriveTimeRequest(request));
+//    free(((Request)request)->dispatch_time);
     free(request);
 }
 
@@ -318,6 +318,7 @@ void setDispatchRequest(Request request, Time new_dispatch_time)
     timersub (new_dispatch_time , request->arrive_time, dispatch);
     request -> dispatch_time->tv_sec = dispatch->tv_sec;
     request -> dispatch_time->tv_usec = dispatch->tv_usec;
+    free(dispatch);
 }
 
 void requestSetThread(Request request, StatThread new_thread)
