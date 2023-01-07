@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include "queue.h"
 #include "stat_thread.h"
+#define MAX_SCHED_NAME 7
 
 // 
 // server.c: A very, very simple web server
@@ -17,6 +18,7 @@
 // helper func
 void scheduleNextRequest(int pending_requests_size, int connfd, char* sched_name, Request request);
 //
+void *workThread(void *arg);
 
 pthread_mutex_t queue_lock;
 pthread_cond_t normal_cond;
@@ -24,49 +26,6 @@ pthread_cond_t block_cond;
 int current_working_num_threads;
 Queue request_queue;
 
-void *workThread(void *stat_thread)
-{
-    StatThread st = (StatThread) stat_thread;
-    Time received_time = malloc(sizeof(struct timeval)); // maybe put this in while
-    Request request;
-    while(1)
-    {
-        pthread_mutex_lock(&queue_lock);
-        for (; isEmptyQueue(request_queue);)
-        {
-            pthread_cond_wait(&normal_cond, &queue_lock);
-        }
-
-        // get the time of day.
-        gettimeofday(received_time, NULL);
-        // get the request
-        request = topElement(request_queue);
-        dequeElement(request_queue);
-
-        // update statistics
-        increaseThreadCount(st);
-        setDispatchRequest(request, received_time);
-        requestSetThread(request, st);
-
-        // count workers
-        ++current_working_num_threads;
-
-        pthread_mutex_unlock(&queue_lock);
-
-        if (request != NULL)
-        {
-            requestHandle(request);
-            Close(getFdRequest(request));
-            destroyRequest(request);
-        }
-
-        pthread_mutex_lock(&queue_lock);
-        --current_working_num_threads;
-        pthread_cond_signal(&block_cond);
-        pthread_mutex_unlock(&queue_lock);
-    }
-    return NULL;
-}
 
 // HW3: Parse the new arguments too
 void getargs(int *port, int argc, char *argv[], int *total_threads, char *sched_name, int *queue_size)
@@ -88,7 +47,7 @@ int main(int argc, char *argv[])
     int listenfd, connfd, port, clientlen;
     int total_thread_num, queue_size;
     struct sockaddr_in clientaddr;
-    char sched_name[7]; // 7 because random is biggest string;
+    char sched_name[MAX_SCHED_NAME]; // 7 because random is biggest string;
     Request req;
 
     getargs(&port, argc, argv, &total_thread_num, sched_name, &queue_size);
@@ -210,6 +169,48 @@ inline void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Re
         return;
     }
 
+}
 
+void *workThread(void *arg)
+{
+    StatThread st = (StatThread) arg;
+    Time received_time = malloc(sizeof(struct timeval)); // maybe put this in while
+    Request request;
+    while(1)
+    {
+        pthread_mutex_lock(&queue_lock);
+        for (; isEmptyQueue(request_queue);)
+        {
+            pthread_cond_wait(&normal_cond, &queue_lock);
+        }
 
+        // get the time of day.
+        gettimeofday(received_time, NULL);
+        // get the request
+        request = topElement(request_queue);
+        dequeElement(request_queue);
+
+        // update statistics
+        increaseThreadCount(st);
+        setDispatchRequest(request, received_time);
+        requestSetThread(request, st);
+
+        // count workers
+        ++current_working_num_threads;
+
+        pthread_mutex_unlock(&queue_lock);
+
+        if (request != NULL)
+        {
+            requestHandle(request);
+            Close(getFdRequest(request));
+            destroyRequest(request);
+        }
+
+        pthread_mutex_lock(&queue_lock);
+        --current_working_num_threads;
+        pthread_cond_signal(&block_cond);
+        pthread_mutex_unlock(&queue_lock);
+    }
+    return NULL;
 }
