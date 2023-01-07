@@ -185,15 +185,6 @@ Queue removeHalfElementsRandomly(Queue q, Queue deletedNodes)
         j--;
     }
 
-//    for(int i = 0; i < numToDelete; i++){
-//        randomIndex = rand() % (q -> currentSize);
-//        if(indexArray[randomIndex] == 1){
-//            i--;
-//        }
-//        else{
-//            indexArray[randomIndex] = 1;
-//        }
-//    }
     Queue remainingQueue = createQueue(q->maxSize, q->copyFunc, q->freeFunc);
     QueueNode temp = q->head;
     int index = 0;

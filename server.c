@@ -53,7 +53,7 @@ void *workThread(void *stat_thread)
 
         pthread_mutex_unlock(&queue_lock);
 
-        if (request)
+        if (request != NULL)
         {
             requestHandle(request);
             Close(getFdRequest(request));
@@ -142,21 +142,6 @@ inline void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Re
         addElement(request_queue,request);
         return;
     }
-    if (!strcmp(sched_name, "block"))
-    {
-//        while (getSizeQueue(request_queue) + current_working_num_threads >= queue_size)
-//        {
-            pthread_cond_wait(&block_cond, &queue_lock);
-//        }
-        addElement(request_queue, request);
-        return;
-    }
-    if (!strcmp(sched_name, "dt"))
-    {
-        destroyRequest(request);
-        Close(connfd);
-        return;
-    }
     if (!strcmp(sched_name, "dh"))
     {
         if (isEmptyQueue(request_queue))
@@ -176,7 +161,6 @@ inline void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Re
         addElement(request_queue, request);
         return;
     }
-
     if (!strcmp(sched_name, "random"))
     {
         if (isEmptyQueue(request_queue))
@@ -209,4 +193,23 @@ inline void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Re
         freeQueue(deleted_vals);
         return;
     }
+
+    if (!strcmp(sched_name, "block"))
+    {
+        while (getSizeQueue(request_queue) + current_working_num_threads >= queue_size)
+        {
+            pthread_cond_wait(&block_cond, &queue_lock);
+        }
+        addElement(request_queue, request);
+        return;
+    }
+    if (!strcmp(sched_name, "dt"))
+    {
+        destroyRequest(request);
+        Close(connfd);
+        return;
+    }
+
+
+
 }
