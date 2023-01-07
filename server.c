@@ -182,7 +182,7 @@ inline void scheduleNextRequest(int queue_size, int connfd, char* sched_name, Re
 
         addElement(request_queue, request);
 
-        while (!isEmptyQueue(deleted_vals))
+        for (;!isEmptyQueue(deleted_vals);)
         {
             tmp_request = topElement(deleted_vals);
             Close(getFdRequest(tmp_request));
